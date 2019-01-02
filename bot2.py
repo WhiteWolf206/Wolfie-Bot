@@ -95,4 +95,9 @@ async def youtube(ctx):
 async def ping(ctx):
     await ctx.send('Pong!')
 
+@bot.command()
+async def github(ctx):
+    await ctx.send('https://github.com/WhiteWolf206/Wolfie-DB')
+
+
 bot.run('')
