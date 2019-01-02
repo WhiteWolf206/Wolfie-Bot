@@ -96,4 +96,3 @@ async def ping(ctx):
     await ctx.send('Pong!')
 
 bot.run('')
-11
