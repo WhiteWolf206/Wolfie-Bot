@@ -1,3 +1,4 @@
+
 import discord
 import sqlite3
 from discord.ext import commands
@@ -16,7 +17,7 @@ logging.basicConfig(level='INFO')
 bot = commands.Bot(command_prefix='w!', description='')
 bot.remove_command("help")
 
-@bot.event
+@bot.listen()
 async def on_ready():
     print(f"Logged in as {bot.user.name}")
     print(f"ID : {bot.user.id}")
@@ -26,6 +27,7 @@ async def on_ready():
     game = discord.Game(f" Being Tortured by my Dev :( | User Count: {len(bot.guilds)}")
     await bot.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
+    await ctx.send('Ready to Go!')
 
 @bot.listen()
 async def on_member_join(member):
