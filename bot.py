@@ -1,4 +1,3 @@
-
 import discord
 import sqlite3
 from discord.ext import commands
@@ -28,6 +27,11 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
     await ctx.send('Ready to Go!')
+
+```the event below is a logging and autorole event (It Logs Joins and Leaves in a specified Channel,
+and Gives new Members an autorole selected by "me" this bot can only be hired by 1 user for now,
+new possibilities will be out soon such as running this bot on multiple servers at once which cant be
+done now```
 
 @bot.listen()
 async def on_member_join(member):
@@ -103,3 +107,4 @@ async def github(ctx):
 
 
 bot.run('')
+
