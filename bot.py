@@ -7,13 +7,14 @@ import random
 import time 
 import datetime
 from datetime import datetime
+import json
 import os
 
 now = datetime.now()
 
 logging.basicConfig(level='INFO')
 
-bot = commands.Bot(command_prefix='w!', description='')
+bot = commands.Bot(command_prefix="w!", description="Me is bot and me is dumb...")
 bot.remove_command("help")
 
 @bot.listen()
@@ -26,12 +27,6 @@ async def on_ready():
     game = discord.Game(f" Being Tortured by my Dev :( | User Count: {len(bot.guilds)}")
     await bot.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
-    await ctx.send('Ready to Go!')
-
-```the event below is a logging and autorole event (It Logs Joins and Leaves in a specified Channel,
-and Gives new Members an autorole selected by "me" this bot can only be hired by 1 user for now,
-new possibilities will be out soon such as running this bot on multiple servers at once which cant be
-done now```
 
 @bot.listen()
 async def on_member_join(member):
@@ -89,22 +84,71 @@ async def on_member_remove(member):
                 channel = discord.utils.get(member.guild.channels, name="testingtesting-123") 
                 await channel.send(embed=embed)
 
-@bot.command()
-async def hello(ctx):
-    await ctx.send('Sup')
 
-@bot.command()
-async def youtube(ctx):
-    await ctx.send('https://www.youtube.com/channel/UC9j8u0TLh3SnPfnskC8tCJg')
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send('Pong!')
+    ping_ = bot.latency
+    ping = round(ping_ * 1000)
+    await ctx.channel.send(f"Ping Value is {ping}ms")
 
 @bot.command()
 async def github(ctx):
-    await ctx.send('https://github.com/WhiteWolf206/Wolfie-DB')
+    await ctx.send("https://github.com/WhiteWolf206/Wolfie-DB")
+    await ctx.send("And Click on this -> https://www.youtube.com/channel/UC9j8u0TLh3SnPfnskC8tCJg and Subcribe to my Devs Channel")
 
+@bot.command()
+async def user(ctx, member:discord.Member = None):
+    if member == None:
+        member = ctx.message.author
+        pronoun = "Your"
+        pronounn = "You"
+    else:
+        pronoun = "Their"
+        pronounn = "They"
+    name = f"{member.name}#{member.discriminator}"
+    status = member.status
+    joined = member.joined_at
+    role = member.top_role
+    await ctx.channel.send(f"***{pronoun} name is {name}***\n***{pronoun} Status is {status}***\n**{pronounn} Joined at {member.joined_at.strftime('%B %d, %Y')}**\n**{pronoun} Highest role is {role}**")
+
+@bot.command()
+@commands.has_any_role("Moderators, Administrators")
+async def kick(ctx, member:discord.User = None, reason = None):
+    if member == None  or member == ctx.message.author:
+        await ctx.channel.send("You Can't Kick yourself!!")
+        return
+    if reason == None:
+        reason = "No Reason was Specified"
+    message = f"You have been Kicked from {ctx.guild.name} for {reason}"
+    await member.send(message)
+    await ctx.guild.kick(member)
+    await ctx.channel.send(f"{member} has Been KICKED! ~~in the arse~~")
+
+@bot.command()
+@commands.has_any_role("Moderators, Administrators")
+async def ban(ctx, member:discord.User = None, reason = None):
+    if member == None or member == ctx.message.author:
+        await ctx.channel.send("You Can't Ban yourself!!")
+        return
+    if reason == None:
+        reason = "No Reason... AT ALL"
+    message = f"You have been Thor Hammered (Banned) from {ctx.guild.name} for {reason}"
+    await member.send(message)
+    await ctx.guild.ban(member)
+    await ctx.channel.send(f"{member} has been BANNED!")
+
+@bot.command(pass_context = True)
+@commands.has_any_role("Moderators, Administrators")
+async def mute(ctx, member: discord.Member):
+    try:
+        role = discord.utils.get(member.server.roles, name="Muted")
+        await bot.add_roles(member, role)
+        embed=discord.Embed(title="User Muted!", description="**{0}** was Muted!".format(member, color=0xff00f6))
+        await bot.say(embed=embed)
+    except:
+        embed=discord.Embed(title="Permission Denied.", description="You don't have permission to use this command.", color=0xff00f6)
+        await bot.say(embed=embed)
 
 bot.run('')
 
