@@ -174,17 +174,32 @@ async def unban(ctx, user:discord.User):
     await ctx.guild.unban(user)
     await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} was Unbanned by {1.name}.".format(user, ctx.message.author)))
 
+@unban.error
+async def unban_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Permission Denied")
+
 @bot.command()
 @commands.has_permissions(manage_roles=True)
 async def roleplus(ctx, member:discord.Member, xrole:discord.Role):
     await member.add_roles(xrole)
     await ctx.send("Role Added!")
 
+@roleplus.error
+async def roleplus_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Permission Denied")
+
 @bot.command()
 @commands.has_permissions(manage_roles=True)
 async def roleminus(ctx, member:discord.Member, xrole:discord.Role):
     await member.remove_roles(xrole)
     await ctx.send("Role Removed!")
+
+@roleminus.error
+async def roleminus_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Permission Denied")
 
 @bot.command()
 @commands.has_permissions(view_audit_log=True)
