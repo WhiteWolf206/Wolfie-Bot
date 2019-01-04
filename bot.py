@@ -84,6 +84,10 @@ async def on_member_remove(member):
                 channel = discord.utils.get(member.guild.channels, name="testingtesting-123") 
                 await channel.send(embed=embed)
 
+
+
+
+
 @bot.command()
 async def ping(ctx):
     ping_ = bot.latency
@@ -168,7 +172,7 @@ async def ban_error(ctx, error):
 @commands.has_permissions(ban_members=True)
 async def unban(ctx, user:discord.User):
     await ctx.guild.unban(user)
-    await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} Has been Unbanned by {1.name}".format(user, ctx.message.author)))
+    await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} was Unbanned by {1.name}.".format(user, ctx.message.author)))
 
 @bot.command()
 @commands.has_permissions(manage_roles=True)
@@ -181,6 +185,19 @@ async def roleplus(ctx, member:discord.Member, xrole:discord.Role):
 async def roleminus(ctx, member:discord.Member, xrole:discord.Role):
     await member.remove_roles(xrole)
     await ctx.send("Role Removed!")
+
+@bot.command()
+@commands.has_permissions(view_audit_log=True)
+async def mute(ctx, member: discord.Member=None, time: int=0, *, reason=None): 
+    if member is None or member == ctx.message.author:
+        await ctx.send("You Can't Mute yourself!!")
+        return
+    if reason is None:
+        reason = "No Reason... AT ALL"
+        await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
+        await ctx.send(f"User Muted for the Duration of {wait_time} for {reason}")
+        await asyncio.sleep(time * 60)
+        await member.remove_roles(role)
 
 bot.run('')
 
