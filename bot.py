@@ -84,8 +84,6 @@ async def on_member_remove(member):
                 channel = discord.utils.get(member.guild.channels, name="testingtesting-123") 
                 await channel.send(embed=embed)
 
-
-
 @bot.command()
 async def ping(ctx):
     ping_ = bot.latency
@@ -112,43 +110,77 @@ async def user(ctx, member:discord.Member = None):
     role = member.top_role
     await ctx.channel.send(f"***{pronoun} name is {name}***\n***{pronoun} Status is {status}***\n**{pronounn} Joined at {member.joined_at.strftime('%B %d, %Y')}**\n**{pronoun} Highest role is {role}**")
 
+@bot.command(pass_context=True)
+async def serverinfo(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(title=f'{guild.name}', colour=discord.Colour.blue())
+    embed.set_thumbnail(url=f'{guild.icon_url}')
+    embed.add_field(name="Server Created in :", value=f'''  {guild.created_at.strftime('%B %d, %Y at %I:%M %p')}''', inline=False)
+    embed.add_field(name="Created by :", value=f'''{guild.owner.mention}''',inline=False)
+    embed.add_field(name='Region :', value=f'''  {guild.region}''',inline=False)
+    embed.add_field(name='Server ID :', value=f'''{guild.id}''',inline=False)
+    embed.add_field(name='Server Members :', value=f'''  {len(guild.members)}''', inline=False)
+    embed.add_field(name='Online Members :',value=f'''{len([I for I in guild.members if I.status is discord.Status.online])}''',inline=False)
+    await ctx.send(embed=embed)
+
 @bot.command()
-@commands.has_any_role("Moderators, Administrators")
+async def owner(ctx):
+    await ctx.send(f"{ctx.guild.owner.mention} **is the Rightful Claiment to the Throne of this Majestirious server**")
+    await ctx.send (f"*That was too Enthusiatsic wasn't it? Anyway iam Sorry.*")
+
+@bot.command()
+@commands.has_permissions(kick_members=True)
 async def kick(ctx, member:discord.User = None, reason = None):
     if member == None  or member == ctx.message.author:
         await ctx.channel.send("You Can't Kick yourself!!")
         return
     if reason == None:
-        reason = "No Reason was Specified"
+        reason = "No Reason... AT ALL."
     message = f"You have been Kicked from {ctx.guild.name} for {reason}"
     await member.send(message)
     await ctx.guild.kick(member)
     await ctx.channel.send(f"{member} has Been KICKED! ~~in the arse~~")
 
+@kick.error
+async def kick_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Permission Denied")
+
 @bot.command()
-@commands.has_any_role("Moderators, Administrators")
+@commands.has_permissions(ban_members=True)
 async def ban(ctx, member:discord.User = None, reason = None):
     if member == None or member == ctx.message.author:
         await ctx.channel.send("You Can't Ban yourself!!")
         return
     if reason == None:
-        reason = "No Reason... AT ALL"
+        reason = "No Reason... AT ALL."
     message = f"You have been Thor Hammered (Banned) from {ctx.guild.name} for {reason}"
     await member.send(message)
     await ctx.guild.ban(member)
     await ctx.channel.send(f"{member} has been BANNED!")
 
-@bot.command(pass_context = True)
-@commands.has_any_role("Moderators, Administrators")
-async def mute(ctx, member: discord.Member):
-    try:
-        role = discord.utils.get(member.server.roles, name="Muted")
-        await bot.add_roles(member, role)
-        embed=discord.Embed(title="User Muted!", description="**{0}** was Muted!".format(member, color=0xff00f6))
-        await bot.say(embed=embed)
-    except:
-        embed=discord.Embed(title="Permission Denied.", description="You don't have permission to use this command.", color=0xff00f6)
-        await bot.say(embed=embed)
+@ban.error
+async def ban_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Permission Denied")
+
+@bot.command()
+@commands.has_permissions(ban_members=True)
+async def unban(ctx, user:discord.User):
+    await ctx.guild.unban(user)
+    await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} Has been Unbanned by {1.name}".format(user, ctx.message.author)))
+
+@bot.command()
+@commands.has_permissions(manage_roles=True)
+async def roleplus(ctx, member:discord.Member, xrole:discord.Role):
+    await member.add_roles(xrole)
+    await ctx.send("Role Added!")
+
+@bot.command()
+@commands.has_permissions(manage_roles=True)
+async def roleminus(ctx, member:discord.Member, xrole:discord.Role):
+    await member.remove_roles(xrole)
+    await ctx.send("Role Removed!")
 
 bot.run('')
 
