@@ -374,4 +374,4 @@ class Moderator:
          await ctx.send("Permission Denied")
 
 
-bot.run("NDQwMjA5NzE0ODAzMTEzOTk5.DxEJng.4mHfSIKMApA-ocZ7DrrgVLpx--U")
+bot.run("TOKEN")
