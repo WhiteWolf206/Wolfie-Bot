@@ -353,10 +353,10 @@ class Moderator:
      if member is None or member == ctx.message.author:
          await ctx.send("You Can't Mute yourself!!")
          return
-     if reason is None:
-         reason = "No Reason... AT ALL"
-         await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
-         await ctx.send(f"{member} has been Muted by {ctx.message.author} for {reason}")
+     if reason == None:
+         result = "No reason... AT ALL"
+     await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
+     await ctx.send(f"{member} has been Muted by {ctx.message.author} for {reason}")
 
  @pmute.error
  async def pmute_error(ctx, error):
