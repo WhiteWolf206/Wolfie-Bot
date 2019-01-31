@@ -6,10 +6,9 @@ import random
 import time 
 import datetime
 from datetime import datetime
-import sqilte3
 
 wolf = commands.Bot(command_prefix = "w!")
-TOKEN = "Nope"
+TOKEN = "Nope!"
 now = datetime.now()
 
 logging.basicConfig(level="INFO")
@@ -17,7 +16,7 @@ logging.basicConfig(level="INFO")
 @wolf.listen()
 async def on_ready():
     print("Wolfie is ready.")
-    game = discord.Game(f" Starting out Strong! | User Count: {len(bot.guilds)}")
+    game = discord.Game(f" Starting out Strong! | User Count: {len(wolf.guilds)}")
     await wolf.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
 
@@ -63,6 +62,7 @@ async def on_member_remove(member):
                 channel = discord.utils.get(member.guild.channels, name="logs")
                 await channel.send(embed=embed)
             except:
+            	pass
 
 class User:
 
@@ -80,8 +80,7 @@ class User:
 
  @wolf.command()
  async def owner(ctx):
- 	guild = ctx.guild
-     await ctx.send(f"{ctx.guild.owner.mention} is the Owner of {guild}")
+     await ctx.send(f"{ctx.guild.owner.mention} is the Owner of this Server/Guild")
      await ctx.send(f"and my Developer/Owner is PaladinWolfenstein#4860")
 
  @wolf.command(pass_context=True)
@@ -99,29 +98,17 @@ class User:
 
  @wolf.command()
  async def user(ctx, member:discord.Member = None):
-     if member == ctx.message.author or None:
-     	membera = ctx.message.author
-     	namea = f"{membera.name}#{membera.discriminator}"
-        statusa = membera.status
-        joineda = membera.joined_at
-        rolea = membera.top_role
- 	    embeda = discord.Embed(title=f'{membera.name}', colour=discord.Colour.purple())
-        embeda.set_thumbnail(url=f'{membera.avatar_url}')
-        embeda.add_field(name=" Name", value=f"{namea}", inline=True)
-        embeda.add_field(name=" Status", value=f"{statusa}", inline=True)
-        embeda.add_field(name=" Join at", value=f"{joineda: %B %d, %Y}", inline=False)
-        embeda.add_field(name=" Highest Role", value=f"{rolea}", inline=True)
-     else:
-     	name = f"{member.name}#{member.discriminator}"
-        status = member.status
-        joined = member.joined_at
-        role = member.top_role     	
- 	    embed = discord.Embed(title=f'{member.name}', colour=discord.Colour.purple())
-        embed.set_thumbnail(url=f'{member.avatar_url}')
-        embed.add_field(name=" Name", value=f"{name}", inline=True)
-        embed.add_field(name=" Status", value=f"{status}", inline=True)
-        embed.add_field(name=" Join at", value=f"{joined: %B %d, %Y}", inline=False)
-        embed.add_field(name=" Highest Role", value=f"{role}", inline=True)
+     name = f"{member.name}#{member.discriminator}"
+     status = member.status
+     joined = member.joined_at
+     role = member.top_role     	
+     embed = discord.Embed(title=f'{member.name}', colour=discord.Colour.blue())
+     embed.set_thumbnail(url=f'{member.avatar_url}')
+     embed.add_field(name=" Name", value=f"{name}", inline=True)
+     embed.add_field(name=" Status", value=f"{status}", inline=True)
+     embed.add_field(name=" Join at", value=f"{joined: %B %d, %Y}", inline=False)
+     embed.add_field(name=" Highest Role", value=f"{role}", inline=True)
+     await ctx.send(embed=embed)
 
 class Moderator:
 
@@ -222,13 +209,12 @@ class Moderator:
 
  @wolf.command(pass_context=True)
  @commands.has_permissions(manage_messages=True)
- async def purgef(ctx, limit: int):
+ async def purge(ctx, limit: int):
  	 await ctx.channel.purge(limit=limit)
  	 await ctx.message.delete()
-     await ctx.send("Messages Deleted!")
 
- @clear.error
- async def clear_error(ctx, error):
+ @purge.error
+ async def purge_error(ctx, error):
 	 if isinstance(error, commands.MissingPermissions):
 		 await ctx.send("Permission Denied")
 
