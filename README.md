@@ -12,7 +12,7 @@ ________________________________________________________________________________
 
 # How much currency is needed for Your Bots services?
 
-**0.99$ And this may change later on.**
+**0.25$ And this may change later on.**
 
 # Can I use your code for my Bot?
 
@@ -21,7 +21,7 @@ was made by me, so that means i get the claim over ALL of the Code.**
 
 # Is This in Async or Rewrite?
 
-**This Project was made with** ***Python Rewrite*** **Because Async is Outdated for most Systems Now.**
+**This Project was made with** ***Discord.py Rewrite*** **Because Async sucks at the moment.**
 
 # What Operating System are you using?
 
