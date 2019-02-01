@@ -8,6 +8,7 @@ import datetime
 from datetime import datetime
 
 wolf = commands.Bot(command_prefix = "w!")
+wolf.remove_command("help")
 TOKEN = "Nope!"
 now = datetime.now()
 
@@ -19,6 +20,12 @@ async def on_ready():
     game = discord.Game(f" Starting out Strong! | User Count: {len(wolf.guilds)}")
     await wolf.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
+
+@wolf.listen()
+async def on_command_error(ctx, error):
+    error = error.__cause__ or error
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Permission Denied")
 
 @wolf.listen()
 async def on_member_join(member):
@@ -62,7 +69,7 @@ async def on_member_remove(member):
                 channel = discord.utils.get(member.guild.channels, name="logs")
                 await channel.send(embed=embed)
             except:
-            	pass
+                pass
 
 class User:
 
@@ -106,8 +113,18 @@ class User:
      embed.set_thumbnail(url=f'{member.avatar_url}')
      embed.add_field(name=" Name", value=f"{name}", inline=True)
      embed.add_field(name=" Status", value=f"{status}", inline=True)
-     embed.add_field(name=" Join at", value=f"{joined: %B %d, %Y}", inline=False)
+     embed.add_field(name="Joined at", value=f"{joined:%B %d, %Y}", inline=True)
      embed.add_field(name=" Highest Role", value=f"{role}", inline=True)
+     await ctx.send(embed=embed)
+
+ @wolf.command()
+ async def xhelp(ctx):
+     embed = discord.Embed(title=f'Help', colour=discord.Colour.red())
+     embed.add_field(name="Ping", value=f"Returns the bots Latency", inline=False)
+     embed.add_field(name="Github", value=f"Returns the bots Github page Link", inline=False)
+     embed.add_field(name="Owner", value=f"Mentions the Owner of the guild the message is sent in", inline=False)
+     embed.add_field(name="Serverinfo", value=f"Returns Information about the guild the message is sent in", inline=False)
+     embed.add_field(name="User", value=f"Returns Information about said User", inline=False)
      await ctx.send(embed=embed)
 
 class Moderator:
@@ -125,11 +142,6 @@ class Moderator:
      await ctx.guild.kick(member)
      await ctx.channel.send(f"{member} has Been KICKED! ~~in the arse~~")
 
- @kick.error
- async def kick_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
-
  @wolf.command()
  @commands.has_permissions(ban_members=True)
  async def ban(ctx, member:discord.User = None, reason = None):
@@ -143,21 +155,11 @@ class Moderator:
      await ctx.guild.ban(member)
      await ctx.channel.send(f"{member} has been BANNED!")
 
- @ban.error
- async def ban_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
-
  @wolf.command()
  @commands.has_permissions(ban_members=True)
  async def unban(ctx, user:discord.User):
      await ctx.guild.unban(user)
      await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} was Unbanned by {1.name}.".format(user, ctx.message.author)))
-
- @unban.error
- async def unban_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
 
  @wolf.command()
  @commands.has_permissions(manage_roles=True)
@@ -165,21 +167,11 @@ class Moderator:
      await member.add_roles(xrole)
      await ctx.send("Role Added!")
 
- @roleplus.error
- async def roleplus_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
-
  @wolf.command()
  @commands.has_permissions(manage_roles=True)
  async def roleminus(ctx, member:discord.Member, xrole:discord.Role):
      await member.remove_roles(xrole)
      await ctx.send("Role Removed!")
-
- @roleminus.error
- async def roleminus_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
 
  @wolf.command()
  @commands.has_permissions(view_audit_log=True)
@@ -192,31 +184,16 @@ class Moderator:
      await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
      await ctx.send(f"{member} has been Muted by {ctx.message.author} for {reason}")
 
- @pmute.error
- async def pmute_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
-
  @wolf.command()
  @commands.has_permissions(view_audit_log=True)
  async def unmute(ctx, member:discord.Member):
     await member.remove_roles(discord.utils.get(member.guild.roles, name="Muted"))
-
- @unmute.error
- async def unmute_error(ctx, error):
-     if isinstance(error, commands.MissingPermissions):
-         await ctx.send("Permission Denied")
 
  @wolf.command(pass_context=True)
  @commands.has_permissions(manage_messages=True)
  async def purge(ctx, limit: int):
  	 await ctx.channel.purge(limit=limit)
  	 await ctx.message.delete()
-
- @purge.error
- async def purge_error(ctx, error):
-	 if isinstance(error, commands.MissingPermissions):
-		 await ctx.send("Permission Denied")
 
 class Voice:
 
