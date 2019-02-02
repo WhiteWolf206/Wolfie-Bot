@@ -2,16 +2,13 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
-import random 
-import time 
+import random
+import time
 import datetime
 from datetime import datetime
 
 wolf = commands.Bot(command_prefix = "w!")
 wolf.remove_command("help")
-TOKEN = "Nope!"
-now = datetime.now()
-
 logging.basicConfig(level="INFO")
 
 @wolf.listen()
@@ -59,17 +56,18 @@ async def on_member_join(member):
 
 @wolf.listen()
 async def on_member_remove(member):
-        if member.bot == False:
-            embed = discord.Embed(title=f"{member.name}#{member.discriminator}",color=0xff0000)
-            embed.add_field(name=f"Join Date", value=f" {member.joined_at.strftime('%B %d, %Y')}",inline=True)
-            embed.add_field(name=f"Leave Date", value=f" {now.strftime('%B %d, %Y')}",inline=True)
-            embed.add_field(name=f"Member Count", value=f" {member.guild.member_count}")
-            embed.set_author(name="Member Left",icon_url=member.avatar_url)
-            try:
-                channel = discord.utils.get(member.guild.channels, name="logs")
-                await channel.send(embed=embed)
-            except:
-                pass
+    now = datetime.now()
+    if member.bot == False:
+        embed = discord.Embed(title=f"{member.name}#{member.discriminator}",color=0xff0000)
+        embed.add_field(name=f"Join Date", value=f" {member.joined_at.strftime('%B %d, %Y')}",inline=True)
+        embed.add_field(name=f"Leave Date", value=f" {now.strftime('%B %d, %Y')}",inline=True)
+        embed.add_field(name=f"Member Count", value=f" {member.guild.member_count}")
+        embed.set_author(name="Member Left",icon_url=member.avatar_url)
+        try:
+            channel = discord.utils.get(member.guild.channels, name="logs")
+            await channel.send(embed=embed)
+        except:
+            pass
 
 class User:
 
@@ -108,7 +106,7 @@ class User:
      name = f"{member.name}#{member.discriminator}"
      status = member.status
      joined = member.joined_at
-     role = member.top_role     	
+     role = member.top_role
      embed = discord.Embed(title=f'{member.name}', colour=discord.Colour.blue())
      embed.set_thumbnail(url=f'{member.avatar_url}')
      embed.add_field(name=" Name", value=f"{name}", inline=True)
@@ -192,17 +190,24 @@ class Moderator:
  @wolf.command(pass_context=True)
  @commands.has_permissions(manage_messages=True)
  async def purge(ctx, limit: int):
- 	 await ctx.channel.purge(limit=limit)
+ 	 await ctx.channel.purge(limit=limit + 1)
  	 await ctx.message.delete()
 
 class Voice:
 
  @wolf.command()
- async def vcjoin():
- 	pass
+ async def vcjoin(ctx):
+     member = ctx.message.author
+     vchannel = ctx.voice_channel
+     channel = ctx.messege.author.voice.voice_channel
+     await wolf.join_voice_channel(channel)
+     if member not in vchannel:
+         await ctx.send("You must be in a Voice Channel First!")
 
  @wolf.command()
- async def vcleave():
- 	pass
+ async def vcleave(ctx):
+     guild = ctx.message.guild
+     voice_wolf = wolf.voice_wolf_in(guild)
+     await voice_client.disconnect()
 
-wolf.run(TOKEN)
+wolf.run("Nope!")
