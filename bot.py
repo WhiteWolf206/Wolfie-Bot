@@ -11,6 +11,15 @@ wolf = commands.Bot(command_prefix = "w!")
 wolf.remove_command("help")
 logging.basicConfig(level="INFO")
 
+players = {}
+queues = {}
+
+def check_queue(id):
+    if queues[id] is not []:
+        player = queues[id].pop[0]
+        players[id] = player
+        player.start()
+    
 @wolf.listen()
 async def on_ready():
     print("Wolfie is ready.")
@@ -197,17 +206,53 @@ class Voice:
 
  @wolf.command()
  async def vcjoin(ctx):
-     member = ctx.message.author
-     vchannel = ctx.voice_channel
-     channel = ctx.messege.author.voice.voice_channel
-     await wolf.join_voice_channel(channel)
-     if member not in vchannel:
-         await ctx.send("You must be in a Voice Channel First!")
+     channel = ctx.author.voice.channel
+     user = ctx.message.author
+     client = ctx.voice_client
+
+     if user is None: #Checks if the user is occupied in a voice channel
+         await ctx.send("You must be in Voice Channel first!")
+     elif client is not None: #checks if the bot\client is already in a voice channel
+         await client.move_to(channel) #moves the client to the authors voice channel
+     else:
+         try:
+             await channel.connect()
+         except asyncio.TimeoutError as e:
+             print(e)
 
  @wolf.command()
  async def vcleave(ctx):
-     guild = ctx.message.guild
-     voice_wolf = wolf.voice_wolf_in(guild)
-     await voice_client.disconnect()
+     await ctx.voice_client.disconnect()
+
+ @wolf.command()
+ async def play(ctx, url):
+     player = await ctx.voice_client.create_ytdl_player(url, after=lambda: check_queue(guild.id))
+     players[guild.id] = player
+     player.start()
+
+ @wolf.command()
+ async def queue(ctx, url):
+     player = await ctx.voice_client.create_ytdl_player(url, after=lambda: check_queue(guild.id))
+     if guild.id in queues:
+         queues[guild.id].append(player)
+     else:
+         queues[guild.id] = [player]
+     await ctx.send("Queue updated. {url} has been Added.")
+     
+
+ @wolf.command()
+ async def pause(ctx):
+     id = ctx.message.author.id
+     players[id].pause()
+
+ @wolf.command()
+ async def resume(ctx):
+     id = ctx.message.author.id
+     players[id].resume()
+
+ @wolf.command()
+ async def stop(ctx):
+     id = ctx.message.author.id
+     players[id].stop()
 
 wolf.run("Nope!")
