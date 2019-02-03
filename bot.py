@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import logging
 import random
+import youtube_dl
 import time
 import datetime
 from datetime import datetime
