@@ -51,7 +51,7 @@ class Voice:
      else:
          queues[guild.id] = [player]
      await ctx.send("Queue updated. {url} has been Added.")
-     
+
 
  @wolf.command()
  async def pause(ctx):
