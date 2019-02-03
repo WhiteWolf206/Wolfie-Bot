@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import youtube_dl
 
 '''Before you continue reading... this is not a cog this is just 
 to help people see the functions and modules conducting my voice class for the bot'''
