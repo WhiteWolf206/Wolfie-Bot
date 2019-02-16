@@ -1,40 +1,31 @@
 import discord
 from discord.ext import commands
+import datetime
+from datetime import datetime
 import asyncio
 import logging
 import random
-import youtube_dl
 import time
-import datetime
-from datetime import datetime
+import sqlite3
 
-wolf = commands.Bot(command_prefix = "w!")
-wolf.remove_command("help")
-logging.basicConfig(level="INFO")
+bot = commands.Bot(command_prefix="w!")
+logging.basicConfig(level='INFO')
+bot.remove_command("help")
 
-players = {}
-queues = {}
-
-def check_queue(id):
-    if queues[id] is not []:
-        player = queues[id].pop[0]
-        players[id] = player
-        player.start()
-    
-@wolf.listen()
+@bot.listen()
 async def on_ready():
-    print("Wolfie is ready.")
-    game = discord.Game(f" Starting out Strong! | User Count: {len(wolf.guilds)}")
-    await wolf.change_presence(status=discord.Status.online,activity=game)
+    print(f"Bot ready!")
+    game = discord.Game(f" Starting out Strong! | User Count: {len(bot.guilds)}")
+    await bot.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
 
-@wolf.listen()
-async def on_command_error(ctx, error):
-    error = error.__cause__ or error
+@bot.listen()
+async def on_error():
+    error = error
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("Permission Denied")
 
-@wolf.listen()
+@bot.listen()
 async def on_member_join(member):
     if member.bot == False:
         embed = discord.Embed(title=f"{member.name}#{member.discriminator}",color=0x009933)
@@ -43,14 +34,14 @@ async def on_member_join(member):
         embed.add_field(name=f"Member Count", value=f" {member.guild.member_count}")
         embed.set_author(name="Member Joined",icon_url=member.avatar_url)
         try:
-            channel = discord.utils.get(member.guild.channels, name="logs")
+            channel = discord.utils.get(member.guild.channels, name="")
             await channel.send(embed=embed)
-            role = discord.utils.get(member.guild.roles, name="Test Subject")
+            role = discord.utils.get(member.guild.roles, name="")
             await member.add_roles(role)
         except:
-            channel = discord.utils.get(member.guild.channels, name="testingtesting-123")
+            channel = discord.utils.get(member.guild.channels, name="")
             await channel.send(embed=embed)
-            role = discord.utils.get(member.guild.roles, name="Test Subject")
+            role = discord.utils.get(member.guild.roles, name="")
             await member.add_roles(role)
     else:
         embed = discord.Embed(title=f"BOT {member.name}#{member.discriminator}",color=0x009933)
@@ -58,13 +49,13 @@ async def on_member_join(member):
         embed.add_field(name=f"Join Date", value=f" {member.joined_at.strftime('%B %d, %Y')}",inline=True)
         embed.set_author(name="Member Joined",icon_url=member.avatar_url)
         try:
-            channel = discord.utils.get(member.guild.channels, name="logs")
+            channel = discord.utils.get(member.guild.channels, name="")
             await channel.send(embed=embed)
         except:
-            channel = discord.utils.get(member.guild.channels, name="testingtesting-123")
+            channel = discord.utils.get(member.guild.channels, name="")
             await channel.send(embed=embed)
 
-@wolf.listen()
+@bot.listen()
 async def on_member_remove(member):
     now = datetime.now()
     if member.bot == False:
@@ -74,34 +65,48 @@ async def on_member_remove(member):
         embed.add_field(name=f"Member Count", value=f" {member.guild.member_count}")
         embed.set_author(name="Member Left",icon_url=member.avatar_url)
         try:
-            channel = discord.utils.get(member.guild.channels, name="logs")
+            channel = discord.utils.get(member.guild.channels, name="")
             await channel.send(embed=embed)
         except:
             pass
 
 class User:
 
- @wolf.command()
+ @bot.command()
  async def ping(ctx):
-     ping_ = wolf.latency
+     ping_ = bot.latency
      ping = round(ping_ * 1000)
      await ctx.channel.send(f"Ping Value is {ping}ms")
 
- @wolf.command()
+ @bot.command()
  async def github(ctx):
-     embed = discord.Embed(title=f"Github", colour=discord.Colour.blue())
-     embed.add_field(name="Link:", value=f"https://github.com/WhiteWolf206/Wolfie-DB")
+     embed = discord.Embed(title="Github Link",description="(https://github.com/WhiteWolf206/Wolfie-DB)",color=0x00FF00)
      await ctx.send(embed=embed)
 
- @wolf.command()
- async def owner(ctx):
-     await ctx.send(f"{ctx.guild.owner.mention} is the Owner of this Server/Guild")
-     await ctx.send(f"and my Developer/Owner is PaladinWolfenstein#4860")
+ @bot.command()
+ async def user(ctx, member:discord.Member):
+     name = f"{member.name}#{member.discriminator}"
+     status = member.status
+     joined = member.joined_at
+     role = member.top_role
 
- @wolf.command(pass_context=True)
+     embed = discord.Embed(
+        title=f'{name}', colour=discord.Colour.blue(
+            )
+        )
+     embed.set_thumbnail(url=f'{member.avatar_url}')
+     embed.add_field(name=f"Status", value=f"{status}",inline=True)
+     embed.add_field(name=f"Joined at", value=f"{joined}",inline=True)
+     embed.add_field(name=f"Highest Role", value=f"{role}",inline=True)
+     await ctx.send(embed=embed)
+
+ @bot.command()
  async def serverinfo(ctx):
      guild = ctx.guild
-     embed = discord.Embed(title=f'{guild.name}', colour=discord.Colour.blue())
+     embed = discord.Embed(
+        title=f'{guild.name}', colour=discord.Colour.blue(
+            )
+        )
      embed.set_thumbnail(url=f'{guild.icon_url}')
      embed.add_field(name="Server Created in :", value=f'''  {guild.created_at.strftime('%B %d, %Y at %I:%M %p')}''', inline=False)
      embed.add_field(name="Created by :", value=f'''{guild.owner.mention}''',inline=False)
@@ -111,33 +116,28 @@ class User:
      embed.add_field(name='Online Members :',value=f'''{len([I for I in guild.members if I.status is discord.Status.online])}''',inline=False)
      await ctx.send(embed=embed)
 
- @wolf.command()
- async def user(ctx, member:discord.Member = None):
-     name = f"{member.name}#{member.discriminator}"
-     status = member.status
-     joined = member.joined_at
-     role = member.top_role
-     embed = discord.Embed(title=f'{member.name}', colour=discord.Colour.blue())
-     embed.set_thumbnail(url=f'{member.avatar_url}')
-     embed.add_field(name=" Name", value=f"{name}", inline=True)
-     embed.add_field(name=" Status", value=f"{status}", inline=True)
-     embed.add_field(name="Joined at", value=f"{joined:%B %d, %Y}", inline=True)
-     embed.add_field(name=" Highest Role", value=f"{role}", inline=True)
-     await ctx.send(embed=embed)
+ @bot.command()
+ async def owner(ctx):
+     await ctx.send(f"{ctx.guild.owner.mention} ***Is the Owner of this Guild/Server***"
+        )
 
- @wolf.command()
+ @bot.command()
  async def xhelp(ctx):
-     embed = discord.Embed(title=f'Help', colour=discord.Colour.red())
-     embed.add_field(name="Ping", value=f"Returns the bots Latency", inline=False)
-     embed.add_field(name="Github", value=f"Returns the bots Github page Link", inline=False)
-     embed.add_field(name="Owner", value=f"Mentions the Owner of the guild the message is sent in", inline=False)
-     embed.add_field(name="Serverinfo", value=f"Returns Information about the guild the message is sent in", inline=False)
-     embed.add_field(name="User", value=f"Returns Information about said User", inline=False)
+     embed = discord.Embed(
+        title=f'Help', colour=discord.Colour.blue(
+            )
+        )
+     embed.add_field(name=f"Ping", value=f"Returns the bots latency",inline=False)
+     embed.add_field(name=f"Github", value=f"Returns the bots Github Page",inline=False)
+     embed.add_field(name=f"User", value=f"Returns Information about specified User",inline=False)
+     embed.add_field(name=f"Serverinfo", value=f"Returns Information about the Server the Message is sent in",inline=False)
+     embed.add_field(name=f"Owner", value=f"Mentions the Owner",inline=False)
+     embed.add_field(name=f"Mod Commands:", value=f"Kick, Ban, Unban, Promote, Demote, Pmute, Unmute, Purge, Warn",inline=False)
      await ctx.send(embed=embed)
 
 class Moderator:
 
- @wolf.command()
+ @bot.command()
  @commands.has_permissions(kick_members=True)
  async def kick(ctx, member:discord.User = None, reason = None):
      if member == None  or member == ctx.message.author:
@@ -150,7 +150,7 @@ class Moderator:
      await ctx.guild.kick(member)
      await ctx.channel.send(f"{member} has Been KICKED! ~~in the arse~~")
 
- @wolf.command()
+ @bot.command()
  @commands.has_permissions(ban_members=True)
  async def ban(ctx, member:discord.User = None, reason = None):
      if member == None or member == ctx.message.author:
@@ -163,97 +163,50 @@ class Moderator:
      await ctx.guild.ban(member)
      await ctx.channel.send(f"{member} has been BANNED!")
 
- @wolf.command()
+ @bot.command()
  @commands.has_permissions(ban_members=True)
  async def unban(ctx, user:discord.User):
      await ctx.guild.unban(user)
      await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} was Unbanned by {1.name}.".format(user, ctx.message.author)))
 
- @wolf.command()
+ @bot.command()
  @commands.has_permissions(manage_roles=True)
- async def roleplus(ctx, member:discord.Member, xrole:discord.Role):
+ async def promote(ctx, member:discord.Member, xrole:discord.Role):
      await member.add_roles(xrole)
      await ctx.send("Role Added!")
 
- @wolf.command()
+ @bot.command()
  @commands.has_permissions(manage_roles=True)
- async def roleminus(ctx, member:discord.Member, xrole:discord.Role):
+ async def demote(ctx, member:discord.Member, xrole:discord.Role):
      await member.remove_roles(xrole)
      await ctx.send("Role Removed!")
 
- @wolf.command()
+ @bot.command()
  @commands.has_permissions(view_audit_log=True)
  async def pmute(ctx, member:discord.Member, reason = None):
      if member is None or member == ctx.message.author:
          await ctx.send("You Can't Mute yourself!!")
          return
-     if reason == None:
-         result = "No reason... AT ALL"
-     await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
-     await ctx.send(f"{member} has been Muted by {ctx.message.author} for {reason}")
+     if reason is None:
+         reason = "No Reason... AT ALL"
+         await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
+         embed = discord.Embed(title=f'Mute Completed.', description=f"{member} has been Muted by {ctx.message.author} for {reason}" colour=discord.Colour.blue())
+         await ctx.send(embed=embed)
 
- @wolf.command()
+
+ @bot.command()
  @commands.has_permissions(view_audit_log=True)
  async def unmute(ctx, member:discord.Member):
     await member.remove_roles(discord.utils.get(member.guild.roles, name="Muted"))
 
- @wolf.command(pass_context=True)
+ @bot.command()
  @commands.has_permissions(manage_messages=True)
- async def purge(ctx, limit: int):
- 	 await ctx.channel.purge(limit=limit + 1)
- 	 await ctx.message.delete()
+ async def purge(ctx, amount: int):
+     await ctx.channel.purge(limit=amount + 1)
 
-class Voice:
+ @bot.command()
+ @commands.has_permissions(view_audit_log=True)
+ async def warn(ctx, member:discord.Member):
+    pass
 
- @wolf.command()
- async def vcjoin(ctx):
-     channel = ctx.author.voice.channel
-     user = ctx.message.author
-     client = ctx.voice_client
-
-     if user is None: #Checks if the user is occupied in a voice channel
-         await ctx.send("You must be in Voice Channel first!")
-     elif client is not None: #checks if the bot\client is already in a voice channel
-         await client.move_to(channel) #moves the client to the authors voice channel
-     else:
-         try:
-             await channel.connect()
-         except asyncio.TimeoutError as e:
-             print(e)
-
- @wolf.command()
- async def vcleave(ctx):
-     await ctx.voice_client.disconnect()
-
- @wolf.command()
- async def play(ctx, url):
-     player = await ctx.voice_client.create_ytdl_player(url, after=lambda: check_queue(guild.id))
-     players[guild.id] = player
-     player.start()
-
- @wolf.command()
- async def queue(ctx, url):
-     player = await ctx.voice_client.create_ytdl_player(url, after=lambda: check_queue(guild.id))
-     if guild.id in queues:
-         queues[guild.id].append(player)
-     else:
-         queues[guild.id] = [player]
-     await ctx.send("Queue updated. {url} has been Added.")
-     
-
- @wolf.command()
- async def pause(ctx):
-     id = ctx.message.author.id
-     players[id].pause()
-
- @wolf.command()
- async def resume(ctx):
-     id = ctx.message.author.id
-     players[id].resume()
-
- @wolf.command()
- async def stop(ctx):
-     id = ctx.message.author.id
-     players[id].stop()
-
-wolf.run("Nope!")
+bot.run("TOKEN")
