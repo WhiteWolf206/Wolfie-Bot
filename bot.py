@@ -6,28 +6,28 @@ import asyncio
 import logging
 import random
 import time
-import sqlite3
+import json
 
-bot = commands.Bot(command_prefix="w!")
+wolfie = commands.Bot(command_prefix="w!")
 logging.basicConfig(level='INFO')
-bot.remove_command("help")
+wolfie.remove_command("help")
 
-@bot.listen()
+@wolfie.listen()
 async def on_ready():
     print(f"Bot ready!")
-    game = discord.Game(f" Starting out Strong! | User Count: {len(bot.guilds)}")
-    await bot.change_presence(status=discord.Status.online,activity=game)
+    game = discord.Game(f" Starting out Strong! | User Count: {len(wolfie.guilds)}")
+    await wolfie.change_presence(status=discord.Status.online,activity=game)
     print(f"Playing {game}")
 
-@bot.listen()
+@wolfie.listen()
 async def on_error():
     error = error
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("Permission Denied")
+        await ctx.send("**Permission Denied**")
 
-@bot.listen()
+@wolfie.listen()
 async def on_member_join(member):
-    if member.bot == False:
+    if member.wolfie == False:
         embed = discord.Embed(title=f"{member.name}#{member.discriminator}",color=0x009933)
         embed.add_field(name=f"Creation Date",value=f" {member.created_at.strftime('%B %d, %Y')}",inline=True)
         embed.add_field(name=f"Join Date", value=f" {member.joined_at.strftime('%B %d, %Y')}",inline=True)
@@ -55,10 +55,10 @@ async def on_member_join(member):
             channel = discord.utils.get(member.guild.channels, name="")
             await channel.send(embed=embed)
 
-@bot.listen()
+@wolfie.listen()
 async def on_member_remove(member):
     now = datetime.now()
-    if member.bot == False:
+    if member.wolfie == False:
         embed = discord.Embed(title=f"{member.name}#{member.discriminator}",color=0xff0000)
         embed.add_field(name=f"Join Date", value=f" {member.joined_at.strftime('%B %d, %Y')}",inline=True)
         embed.add_field(name=f"Leave Date", value=f" {now.strftime('%B %d, %Y')}",inline=True)
@@ -70,20 +70,25 @@ async def on_member_remove(member):
         except:
             pass
 
+async def update_data(warnq, member):
+    member_id = str(member.id)
+    warnq.setdefault(member_id, {"Name": member.name, "Warns": 0})
+    warnq[member_id]["Warns"] += 1
+
 class User:
 
- @bot.command()
+ @wolfie.command()
  async def ping(ctx):
-     ping_ = bot.latency
+     ping_ = wolfie.latency
      ping = round(ping_ * 1000)
-     await ctx.channel.send(f"Ping Value is {ping}ms")
+     await ctx.channel.send(f"**Ping Value is {ping}ms**")
 
- @bot.command()
+ @wolfie.command()
  async def github(ctx):
      embed = discord.Embed(title="Github Link",description="(https://github.com/WhiteWolf206/Wolfie-DB)",color=0x00FF00)
      await ctx.send(embed=embed)
 
- @bot.command()
+ @wolfie.command()
  async def user(ctx, member:discord.Member):
      name = f"{member.name}#{member.discriminator}"
      status = member.status
@@ -100,7 +105,7 @@ class User:
      embed.add_field(name=f"Highest Role", value=f"{role}",inline=True)
      await ctx.send(embed=embed)
 
- @bot.command()
+ @wolfie.command()
  async def serverinfo(ctx):
      guild = ctx.guild
      embed = discord.Embed(
@@ -116,12 +121,12 @@ class User:
      embed.add_field(name='Online Members :',value=f'''{len([I for I in guild.members if I.status is discord.Status.online])}''',inline=False)
      await ctx.send(embed=embed)
 
- @bot.command()
+ @wolfie.command()
  async def owner(ctx):
-     await ctx.send(f"{ctx.guild.owner.mention} ***Is the Owner of this Guild/Server***"
+     await ctx.send(f"{ctx.guild.owner.mention} **Is the Owner of this Guild/Server**"
         )
 
- @bot.command()
+ @wolfie.command()
  async def xhelp(ctx):
      embed = discord.Embed(
         title=f'Help', colour=discord.Colour.blue(
@@ -137,76 +142,124 @@ class User:
 
 class Moderator:
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(kick_members=True)
  async def kick(ctx, member:discord.User = None, reason = None):
      if member == None  or member == ctx.message.author:
-         await ctx.channel.send("You Can't Kick yourself!!")
+         await ctx.channel.send("**You Can't Kick yourself!!**")
          return
      if reason == None:
-         reason = "No Reason... AT ALL."
-     message = f"You have been Kicked from {ctx.guild.name} for {reason}"
+         reason = "**No Reason... AT ALL.**"
+     message = f"**You have been Kicked from** ***{ctx.guild.name}*** **for** {reason}"
      await member.send(message)
      await ctx.guild.kick(member)
-     await ctx.channel.send(f"{member} has Been KICKED! ~~in the arse~~")
+     await ctx.channel.send(f"{member} ***has Been KICKED!*** ~~in the arse~~")
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(ban_members=True)
  async def ban(ctx, member:discord.User = None, reason = None):
      if member == None or member == ctx.message.author:
-         await ctx.channel.send("You Can't Ban yourself!!")
+         await ctx.channel.send("**You Can't Ban yourself!!**")
          return
      if reason == None:
-         reason = "No Reason... AT ALL."
-     message = f"You have been Thor Hammered (Banned) from {ctx.guild.name} for {reason}"
+         reason = "**No Reason... AT ALL.**"
+     message = f"**You have been Thor Hammered (Banned) from** ***{ctx.guild.name}*** **for** {reason}"
      await member.send(message)
      await ctx.guild.ban(member)
-     await ctx.channel.send(f"{member} has been BANNED!")
-
- @bot.command()
+     await ctx.channel.send(f"{member} ***has been BANNED!***")
+     
+ @wolfie.command()
  @commands.has_permissions(ban_members=True)
  async def unban(ctx, user:discord.User):
      await ctx.guild.unban(user)
      await ctx.send(embed = discord.Embed(title="User Unbanned",description="{0.name} was Unbanned by {1.name}.".format(user, ctx.message.author)))
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(manage_roles=True)
  async def promote(ctx, member:discord.Member, xrole:discord.Role):
      await member.add_roles(xrole)
-     await ctx.send("Role Added!")
+     await ctx.send("**Role Added!**")
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(manage_roles=True)
  async def demote(ctx, member:discord.Member, xrole:discord.Role):
      await member.remove_roles(xrole)
-     await ctx.send("Role Removed!")
+     await ctx.send("**Role Removed!**")
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(view_audit_log=True)
  async def pmute(ctx, member:discord.Member, reason = None):
      if member is None or member == ctx.message.author:
-         await ctx.send("You Can't Mute yourself!!")
+         await ctx.send("**You Can't Mute yourself!!**")
          return
      if reason is None:
          reason = "No Reason... AT ALL"
          await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
-         embed = discord.Embed(title=f'Mute Completed.', description=f"{member} has been Muted by {ctx.message.author} for {reason}" colour=discord.Colour.blue())
+         embed = discord.Embed(title=f'Mute Completed.', description=f"{member} has been Muted by {ctx.message.author} for {reason}", colour=discord.Colour.blue())
          await ctx.send(embed=embed)
 
-
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(view_audit_log=True)
  async def unmute(ctx, member:discord.Member):
     await member.remove_roles(discord.utils.get(member.guild.roles, name="Muted"))
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(manage_messages=True)
  async def purge(ctx, amount: int):
      await ctx.channel.purge(limit=amount + 1)
 
- @bot.command()
+ @wolfie.command()
  @commands.has_permissions(view_audit_log=True)
- async def warn(ctx, member:discord.Member):
-    pass
+ async def warn(ctx, member:discord.Member = None):
+     if member is None:
+        await ctx.send("**Please Specify a User.**")
+        return
+     member_id = str(member.id)
+     with open('bwarns.json', 'r') as f:
+        warnq = json.load(f)
+        await update_data(warnq, member)
 
-bot.run("TOKEN")
+     with open('bwarns.json', 'w') as f:
+        json.dump(warnq, f)
+        
+     await ctx.send("**User Warned.**")
+
+     with open('bwarns.json', 'r') as f:
+        if warnq[member_id]["Warns"] == 3:
+            await member.add_roles(discord.utils.get(member.guild.roles, name="Muted"))
+            await ctx.send("**Warn Limit Reached, User Muted.**")
+
+            with open('bwarns.json', "r") as f:
+                warnq[member_id]["Warns"] = 0
+            with open('bwarns.json', "w") as f:
+                json.dump(warnq, f)
+                await ctx.send("**Warns Cleared.**")
+
+        else:
+            pass
+
+ @wolfie.command()
+ @commands.has_permissions(view_audit_log=True)
+ async def cwarns(ctx, member:discord.Member):
+    member_id = str(member.id)
+    with open('bwarns.json', "r") as f:
+        warnq = json.load(f)
+        member_id = str(member.id)
+        warnq[member_id]["Warns"] = 0
+
+    with open('bwarns.json', "w") as f:
+        json.dump(warnq, f)
+    await ctx.send("**Warns Cleared.**")
+
+ @wolfie.command()
+ async def warns(ctx, member:discord.Member = None):
+    if member is None:
+        member = ctx.message.author
+    member_id = str(member.id)
+    with open('bwarns.json', "r") as f:
+        warnq = json.load(f)
+        w = warnq[str(member_id)]["Warns"]
+        await ctx.send("**Warn Count:**")         
+        await ctx.send(w)
+
+wolfie.run("Nope!")
