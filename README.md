@@ -15,4 +15,4 @@ ________________________________________________________________________________
 
 # What Operating System are you using?
 
-**I Personally use Windows 10 Operating System with Python version 3.7**
+**I Use Windows 10 Operating System with Python version 3.7**
