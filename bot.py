@@ -148,4 +148,4 @@ async def help(ctx):
     await member.send(embed=embed)
     await ctx.send("**A List of all the commands has been Sent to your DMs**")
 
-wolfie.run("Token")
+wolfie.run("No No")
