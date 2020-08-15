@@ -1,6 +1,6 @@
 # Wolfie-DB
 
-**This is my 1st Github Coding Project (using Python), The Bot's name is Wolfie,  I would Appreciate your Help and Support me with this Project.
+This is my 1st Github Coding Project (using Python), The Bot's name is Wolfie,  I would Appreciate your Help and Support me with this Project.
 ________________________________________________________________________________________________________________________________
 
 # FAQ
@@ -15,4 +15,4 @@ ________________________________________________________________________________
 
 # What Operating System are you using?
 
-**I Use Windows 10 Operating System with Python version 3.7**
+**I Use Windows 10 Operating System with Python version 3.8.5**
