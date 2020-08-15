@@ -1,6 +1,6 @@
 # Wolfie-DB
 
-This is my 1st Github Coding Project (using Python), The Bot's name is Wolfie,  I would Appreciate your Help and Support me with this Project.
+This is my 1st Github Coding Project (using Python), The Bot's name is Wolfie,  I would Appreciate your Help and Support with this Project.
 ________________________________________________________________________________________________________________________________
 
 # FAQ
